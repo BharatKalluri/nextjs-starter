@@ -1,32 +1,25 @@
 import React from "react";
 
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import { GetServerSidePropsContext } from "next";
 import Layout from "../components/layout";
-import serverSidePropsAuthGuard from "../lib/guards/server-side-props-auth.guard";
+import withPrivateServerSideProps from "../lib/guards/server-side-props-auth.guard";
+import { getUserFromCookie } from "../lib/auth-helpers";
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  // This needs to be repeated for all server side authenticated pages :(
-  const { tokenData, err } = await serverSidePropsAuthGuard(ctx);
-  if (err !== null) {
-    return {
-      redirect: { permanent: false, destination: "/" },
-      props: {} as never,
-    };
+interface IProps {
+  message: string;
+}
+
+export const getServerSideProps = withPrivateServerSideProps(
+  async (ctx: GetServerSidePropsContext): Promise<{ props: IProps }> => {
+    const user = await getUserFromCookie(ctx);
+    return { props: { message: `User details ${user.email}` } };
   }
+);
 
-  return {
-    props: {
-      message: `Your email is ${tokenData?.email} and your UID is ${tokenData?.uid}.`,
-    },
-  };
-};
-
-function AuthenticatedPage(
-  props: InferGetServerSidePropsType<typeof getServerSideProps>
-) {
+function AuthenticatedPage(props: IProps) {
   return (
     <Layout title={"Authenticated page"}>
-      <p>{props.message!}</p>
+      <p>{props.message}</p>
     </Layout>
   );
 }

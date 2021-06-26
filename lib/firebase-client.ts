@@ -13,7 +13,8 @@ if (!firebaseClient.apps.length && typeof window !== "undefined") {
   firebaseClient.initializeApp(CLIENT_CONFIG);
   firebaseClient
     .auth()
-    .setPersistence(firebaseClient.auth.Auth.Persistence.SESSION);
+    .setPersistence(firebaseClient.auth.Auth.Persistence.SESSION)
+    .catch((reason) => console.error(reason));
   (window as any).firebase = firebaseClient;
 }
 

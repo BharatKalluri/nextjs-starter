@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext, createContext } from "react";
 import nookies from "nookies";
 import { firebaseClient } from "../lib/firebase-client";
 
+const TEN_MIN_IN_MS = 10 * 60 * 1000;
+
 const AuthContext = createContext<{ user: firebaseClient.User | null }>({
   user: null,
 });
@@ -13,6 +15,7 @@ export function AuthProvider({ children }: any) {
     if (typeof window !== "undefined") {
       (window as any).nookies = nookies;
     }
+
     return firebaseClient.auth().onIdTokenChanged(async (user) => {
       if (!user) {
         setUser(null);
@@ -32,7 +35,7 @@ export function AuthProvider({ children }: any) {
     const handle = setInterval(async () => {
       const user = firebaseClient.auth().currentUser;
       if (user) await user.getIdToken(true);
-    }, 10 * 60 * 1000);
+    }, TEN_MIN_IN_MS);
     return () => clearInterval(handle);
   }, []);
 

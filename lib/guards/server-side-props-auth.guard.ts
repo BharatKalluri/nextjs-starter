@@ -1,21 +1,37 @@
-import { GetServerSidePropsContext } from "next";
-import nookies from "nookies";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { firebaseAdmin } from "../firebase-admin";
-import { auth } from "firebase-admin/lib/auth";
+import nookies from "nookies";
 
-export default async function serverSidePropsAuthGuard(
-  ctx: GetServerSidePropsContext
-): Promise<
-  | { tokenData: auth.DecodedIdToken; err: null }
-  | { tokenData: null; err: Error }
-> {
+const FALLBACK_IF_NO_AUTH_ROUTE = "/";
+
+const isAuthenticated = async (ctx: GetServerSidePropsContext) => {
   try {
     const cookies = nookies.get(ctx);
-    return {
-      tokenData: await firebaseAdmin.auth().verifyIdToken(cookies.token),
-      err: null,
-    };
-  } catch (err) {
-    return { tokenData: null, err };
+    await firebaseAdmin.auth().verifyIdToken(cookies.token);
+    return true;
+  } catch (e) {
+    return false;
   }
+};
+
+export default function withPrivateServerSideProps<P>(
+  getServerSidePropsFunc?: GetServerSideProps
+): GetServerSideProps {
+  return async (ctx: GetServerSidePropsContext) => {
+    const _isAuthenticated = await isAuthenticated(ctx);
+
+    if (!_isAuthenticated) {
+      return {
+        redirect: {
+          destination: `${FALLBACK_IF_NO_AUTH_ROUTE}?redirectTo=${ctx.resolvedUrl}`,
+          permanent: false,
+        },
+      };
+    }
+
+    if (getServerSidePropsFunc) {
+      return await getServerSidePropsFunc(ctx);
+    }
+    return { props: {} };
+  };
 }

@@ -23,6 +23,10 @@ const navBarItems: Array<{ href: string; text: string }> = [
     href: "/",
     text: "Home",
   },
+  {
+    href: "/authenticated",
+    text: "Check auth",
+  },
 ];
 const NavBarMenuItem = (props: INavBarButtonProps) => {
   return (

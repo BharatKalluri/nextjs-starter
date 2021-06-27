@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, createContext } from "react";
 import nookies from "nookies";
-import { firebaseClient } from "../lib/firebase-client";
+import { firebaseClient } from "../lib/services/firebase-client";
 
 const TEN_MIN_IN_MS = 10 * 60 * 1000;
 

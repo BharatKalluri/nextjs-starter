@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { firebaseAdmin } from "../firebase-admin";
+import { firebaseAdmin } from "../services/firebase-admin";
 import nookies from "nookies";
 
 const FALLBACK_IF_NO_AUTH_ROUTE = "/";

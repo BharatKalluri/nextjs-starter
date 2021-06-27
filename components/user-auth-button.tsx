@@ -1,5 +1,5 @@
 import { useAuth } from "./auth-context";
-import { googleLogin, logout } from "../lib/firebase-client";
+import { googleLogin, logout } from "../lib/services/firebase-client";
 import { Button } from "@chakra-ui/react";
 
 const UserAuthButton = () => {
